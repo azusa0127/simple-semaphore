@@ -41,7 +41,7 @@ module.exports = Semaphore;
 ```
 
 ## Example
-See a full classic Producer-Consumer example in [`example.js`](/master/example.js)
+See a full classic Producer-Consumer example in [`example.js`](/example.js)
 
 Require
 ```javascript
