@@ -1,6 +1,6 @@
 {
   "name": "simple-semaphore",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple semaphore implementation with promise support.",
   "main": "index.js",
   "scripts": {
