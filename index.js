@@ -1,3 +1,16 @@
+/**
+ * simple-semaphore
+ * A modern and simple implementation for semaphore with promise support.
+ *
+ * @author Phoenix (github.com/azusa0127)
+ * @version 1.1.0
+ */
+
+/**
+ * Semephore class with wait() in promise.
+ *
+ * @class Semaphore
+ */
 class Semaphore {
   /**
    * Creates an instance of Semaphore.
@@ -23,24 +36,28 @@ class Semaphore {
 
   /**
    * Attempt to acquire or consume a semaphore value,
+   * @async This is an async function and returns a promise.
    *
-   * @async This is an async function and returns an promise.
+   * @param {number} [n=1] number of times to wait until the Promise resolves.
    * @returns A resolved promise when internal semaphore value is positive or a promise put on the waiting queue that resolves when signal() gets called.
    * @memberof Semaphore
    */
-  wait() {
-    return this._sem > 0 && --this._sem >= 0
-      ? Promise.resolve()
-      : new Promise(resolve => this._queue.push(resolve));
+  async wait(n = 1) {
+    while (n--) {
+      await new Promise(resolve => {
+        this._sem > 0 && --this._sem >= 0 ? resolve() : this._queue.push(resolve);
+      });
+    }
   }
 
   /**
-   * Increase internal semaphore value or resolve the first promise in the waiting queue.
+   * Increase internal semaphore value or resolve the first promises in the waiting queue.
    *
+   * @param {number} [n=1] number of times to increase internal semaphore value or resolve waiting queue promises.
    * @memberof Semaphore
    */
-  signal() {
-    this._queue.length ? this._queue.shift()() : ++this._sem;
+  signal(n = 1) {
+    while (n--) this._queue.length ? this._queue.shift()() : ++this._sem;
   }
 }
 

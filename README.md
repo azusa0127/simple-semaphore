@@ -6,6 +6,10 @@ Simple semaphore implementation with promise support.
 npm i simple-semaphore
 ```
 
+## Requirement
+
+`NodeJS 7.6.0+` as async/await feature is used.
+
 ## API
 ```javascript
 class Semaphore {
@@ -18,23 +22,25 @@ class Semaphore {
 
   /**
    * Attempt to acquire or consume a semaphore value,
-   *
    * @async This is an async function and returns an promise.
+   *
+   * @param {number} [n=1] number of times to consume internal semaphore value or wait in the queue until resolve.
    * @returns A resolved promise when internal semaphore value is positive or a promise put on the waiting queue that resolves when signal() gets called.
    * @memberof Semaphore
    */
-  async wait();
-  async take(); // Alias for this.wait().
-  async P(); // Alias for this.wait().
+  async wait(n = 1);
+  async take(n = 1); // Alias for this.wait().
+  async P(n = 1); // Alias for this.wait().
 
   /**
-   * Increase internal semaphore value or resolve the first promise in the waiting queue.
+   * Increase internal semaphore value or resolve the first promises in the waiting queue.
    *
+   * @param {number} [n=1] number of times to increase internal semaphore value or resolve waiting queue promises.
    * @memberof Semaphore
    */
-  signal();
-  release(); // Alias for this.signal().
-  V(); // Alias for this.signal().
+  signal(n = 1);
+  release(n = 1); // Alias for this.signal().
+  V(n = 1); // Alias for this.signal().
 }
 
 module.exports = Semaphore;
@@ -70,7 +76,7 @@ Promise Style.
 ```javascript
 const produce = () => sem_notFull.wait().then(()=>{
   // produce...
-  sem_notEmpty.signal();
+  sem_notEmpty.signal(10); // Signals 10 times instantly.
 });
 
 const consume = () => sem_notEmpty.wait().then(()=>{
@@ -78,6 +84,11 @@ const consume = () => sem_notEmpty.wait().then(()=>{
   sem_notFull.signal();
 });
 ```
+## Changelog
+1.1.0 / 2017-08-07
+  * Added param `n` to `signal()` and `wait()` for batch semaphore operation.
+
+1.0.0 / Initial Release.
 
 ## Lisense
 Licensed under MIT
