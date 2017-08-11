@@ -55,7 +55,7 @@ class EfficientProducer extends Producer {
     await stock.notfull.wait(10);
     stock.items += 10;
     assert(stock.items <= 10, `Stock overflowed! ${stock.items}`);
-    console.log(`Stock after produce: ${stock.items}`);
+    console.log(`Stock after effective produce: ${stock.items}`);
     stock.notempty.signal(10);
   }
 
@@ -66,8 +66,8 @@ class EfficientProducer extends Producer {
 
 // Async wrapped main function.
 async function main() {
-  console.log(`[Single step producer]`);
-  const workers = [
+  console.log(`\n\n[Single step producer]`);
+  const workers1 = [
     new Producer(100),
     new Producer(100),
     new Producer(100),
@@ -76,9 +76,9 @@ async function main() {
     new Consumer(200),
     new Consumer(300),
   ];
-  await Promise.all(workers.map(x => x.work()));
+  await Promise.all(workers1.map(x => x.work()));
 
-  console.log(`[Efficient producer]`);
+  console.log(`\n\n[Efficient producer]`);
   const workers2 = [
     new EfficientProducer(10),
     new Consumer(10),
@@ -90,8 +90,15 @@ async function main() {
     new Consumer(20),
     new Consumer(20),
   ];
-
   await Promise.all(workers2.map(x => x.work()));
+
+  console.log(`\n\n[RejectAll() API test]`);
+  const p = new Consumer(1).work();
+  stock.notempty.rejectAll();
+  p.then(
+    () => console.error(`[ERROR] This promise should not resolve.`),
+    () => console.log(`Successful.`),
+  );
 }
 
 // Invocation of main function.

@@ -2,8 +2,8 @@
 Simple semaphore implementation with promise support.
 
 ## Install
-```
-npm i simple-semaphore
+```bash
+npm install simple-semaphore
 ```
 
 ## Requirement
@@ -16,31 +16,29 @@ class Semaphore {
   /**
    * Creates an instance of Semaphore.
    * @param {number} [capacity=1] Initial Semaphore value, should be non-negative.
-   * @memberof Semaphore
    */
-  constructor(capacity = 1){};
+  constructor(capacity = 1) {}
 
   /**
-   * Attempt to acquire or consume a semaphore value,
-   * @async This is an async function and returns an promise.
-   *
-   * @param {number} [n=1] number of times to consume internal semaphore value or wait in the queue until resolve.
-   * @returns A resolved promise when internal semaphore value is positive or a promise put on the waiting queue that resolves when signal() gets called.
-   * @memberof Semaphore
+   * Attempt to acquire/consume semaphore value,
+   * @param {number} [n=1] repeated times.
+   * @async
+   * @returns {Promise<undefined>} promise resolves when passing semaphore condition.
    */
-  async wait(n = 1);
-  async take(n = 1); // Alias for this.wait().
-  async P(n = 1); // Alias for this.wait().
+  async wait(n = 1) {}
+  async take(n = 1) {} /** @alias Semaphore.wait */
+  async P(n = 1) {} /** @alias Semaphore.wait */
 
   /**
-   * Increase internal semaphore value or resolve the first promises in the waiting queue.
-   *
-   * @param {number} [n=1] number of times to increase internal semaphore value or resolve waiting queue promises.
-   * @memberof Semaphore
+   * Resolve waiting promises or increment semaphore value.
+   * @param {number} [n=1] repeated times.
    */
-  signal(n = 1);
-  release(n = 1); // Alias for this.signal().
-  V(n = 1); // Alias for this.signal().
+  signal(n = 1) {}
+  release(n = 1) {} /** @alias Semaphore.signal */
+  V(n = 1) {} /** @alias Semaphore.signal */
+
+  /** Reject all promises on the waiting queue. */
+  rejectAll() {}
 }
 
 module.exports = Semaphore;
@@ -49,16 +47,14 @@ module.exports = Semaphore;
 ## Example
 See a full classic Producer-Consumer example in [`example.js`](/example.js)
 
-Require
+### Require and Initialize
 ```javascript
 const Semaphore = require(`simple-semaphore`);
-```
-Initiliaze
-```javascript
+
 const sem_notFull = new Semaphore(10),
   sem_notEmpty = new Semaphore(0);
 ```
-Async/Await Style.
+### Async/Await Style.
 ```javascript
 const produce = async () {
   await sem_notFull.wait();
@@ -72,9 +68,9 @@ const consume = async () {
   sem_notFull.signal();
 };
 ```
-Promise Style.
+### Promise Style.
 ```javascript
-const produce = () => sem_notFull.wait().then(()=>{
+const produce = () => sem_notFull.wait(10).then(()=>{ // Wait 10 times before resolve.
   // produce...
   sem_notEmpty.signal(10); // Signals 10 times instantly.
 });
@@ -84,7 +80,18 @@ const consume = () => sem_notEmpty.wait().then(()=>{
   sem_notFull.signal();
 });
 ```
+### Advanced hacks
+```javascript
+sem_notFull._sem // check the internal semaphore value
+sem_notFull._queue.length // check the internal waiting queue length
+sem_notFull.rejectAll() // reject and remove all promises from the waiting queue.
+```
 ## Changelog
+2.0.0 / 2017-08-10
+  * (Perfomance) Up to 10x faster by switching waiting queue to [fastqueue](https://www.npmjs.com/package/fastqueue).
+  + (New API) `rejectAll()` - Now the `_queue` stores both `[resolve, reject]` function references for every waiting promise. So promise from `wait()` may now reject if `rejectAll()` called.
+  * (JSDoc) Style improvement.
+
 1.1.0 / 2017-08-07
   * Added param `n` to `signal()` and `wait()` for batch semaphore operation.
 

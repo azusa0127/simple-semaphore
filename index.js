@@ -3,61 +3,61 @@
  * A modern and simple implementation for semaphore with promise support.
  *
  * @author Phoenix (github.com/azusa0127)
- * @version 1.1.0
+ * @version 2.0.0
  */
+const FastQueue = require(`fastqueue`);
 
-/**
- * Semephore class with wait() in promise.
- *
- * @class Semaphore
- */
+/** Semephore class to be exported. */
 class Semaphore {
   /**
    * Creates an instance of Semaphore.
    * @param {number} [capacity=1] Initial Semaphore value, should be non-negative.
-   * @memberof Semaphore
    */
   constructor(capacity = 1) {
     // Internal semaphore value.
     this._sem = Math.floor(capacity);
     // Internal waiting queue.
-    this._queue = [];
+    this._queue = new FastQueue();
     // Validate capacity.
     if (typeof capacity !== `number` || this._sem < 0)
       throw new Error(`Invalid Capacity ${capacity}`);
 
     // Common function alias
+    /** @alias Semaphore.wait @see Semaphore.wait */
     this.P = this.wait;
+    /** @alias Semaphore.signal @see Semaphore.signal */
     this.V = this.signal;
 
+    /** @alias Semaphore.wait @see Semaphore.wait */
     this.take = this.wait;
+    /** @alias Semaphore.signal @see Semaphore.signal */
     this.release = this.signal;
   }
 
   /**
-   * Attempt to acquire or consume a semaphore value,
-   * @async This is an async function and returns a promise.
-   *
-   * @param {number} [n=1] number of times to wait until the Promise resolves.
-   * @returns A resolved promise when internal semaphore value is positive or a promise put on the waiting queue that resolves when signal() gets called.
-   * @memberof Semaphore
+   * Attempt to acquire/consume semaphore value,
+   * @param {number} [n=1] repeated times.
+   * @async
+   * @returns {Promise<undefined>} promise resolves when passing semaphore condition.
    */
   async wait(n = 1) {
-    while (n--) {
-      await new Promise(resolve => {
-        this._sem > 0 && --this._sem >= 0 ? resolve() : this._queue.push(resolve);
+    while (n--)
+      await new Promise((resolve, reject) => {
+        this._sem > 0 && --this._sem >= 0 ? resolve() : this._queue.push([resolve, reject]);
       });
-    }
   }
 
   /**
-   * Increase internal semaphore value or resolve the first promises in the waiting queue.
-   *
-   * @param {number} [n=1] number of times to increase internal semaphore value or resolve waiting queue promises.
-   * @memberof Semaphore
+   * Resolve waiting promises or increment semaphore value.
+   * @param {number} [n=1] repeated times.
    */
   signal(n = 1) {
-    while (n--) this._queue.length ? this._queue.shift()() : ++this._sem;
+    while (n--) this._queue.length ? this._queue.shift()[0]() : ++this._sem;
+  }
+
+  /** Reject all promises on the waiting queue. */
+  rejectAll() {
+    while (this._queue.length) this._queue.shift()[1]();
   }
 }
 
