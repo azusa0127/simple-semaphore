@@ -3,7 +3,7 @@
  * A modern and simple implementation for semaphore with promise support.
  *
  * @author Phoenix (github.com/azusa0127)
- * @version 2.0.0
+ * @version 2.0.1
  */
 const FastQueue = require(`fastqueue`);
 
@@ -57,7 +57,8 @@ class Semaphore {
 
   /** Reject all promises on the waiting queue. */
   rejectAll() {
-    while (this._queue.length) this._queue.shift()[1]();
+    while (this._queue.length)
+      this._queue.shift()[1](new Error(`[Semaphore] Task cancled as rejectAll() gets called.`));
   }
 }
 

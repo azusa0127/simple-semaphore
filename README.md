@@ -87,6 +87,9 @@ sem_notFull._queue.length // check the internal waiting queue length
 sem_notFull.rejectAll() // reject and remove all promises from the waiting queue.
 ```
 ## Changelog
+2.0.1 / 2017-08-10
+  * (Bugfix) Added rejection error messge.
+
 2.0.0 / 2017-08-10
   * (Perfomance) Up to 10x faster by switching waiting queue to [fastqueue](https://www.npmjs.com/package/fastqueue).
   + (New API) `rejectAll()` - Now the `_queue` stores both `[resolve, reject]` function references for every waiting promise. So promise from `wait()` may now reject if `rejectAll()` called.

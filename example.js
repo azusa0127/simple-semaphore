@@ -97,7 +97,7 @@ async function main() {
   stock.notempty.rejectAll();
   p.then(
     () => console.error(`[ERROR] This promise should not resolve.`),
-    () => console.log(`Successful.`),
+    err => console.log(`Successfully received a rejected Error - ${err.message}`),
   );
 }
 
