@@ -1,11 +1,11 @@
-# simple-semaphore [![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url] [![javascript style guide][standard-image]][standard-url]
+# simple-semaphore [![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url]
 
 [npm-image]: https://img.shields.io/npm/v/simple-semaphore.svg
 [npm-url]: https://npmjs.org/package/simple-semaphore
 [downloads-image]: https://img.shields.io/npm/dm/simple-semaphore.svg
 [downloads-url]: https://npmjs.org/package/simple-semaphore
 
-#### A fast implementation of semaphore with promises.
+#### A fast semaphore implementation with promises.
 
 ## Install
 
