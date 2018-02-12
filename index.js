@@ -1,9 +1,9 @@
 /**
  * simple-semaphore
- * A modern and simple implementation for semaphore with promise support.
+ * A fast implementation for semaphore with promise support.
  *
  * @author Phoenix (github.com/azusa0127)
- * @version 2.0.1
+ * @version 2.1.0
  */
 const FastQueue = require(`fastqueue`);
 
@@ -11,16 +11,17 @@ const FastQueue = require(`fastqueue`);
 class Semaphore {
   /**
    * Creates an instance of Semaphore.
-   * @param {number} [capacity=1] Initial Semaphore value, should be non-negative.
+   * @param {number} [capacity=1] - Initial Semaphore value, should be non-negative.
    */
-  constructor(capacity = 1) {
+  constructor (capacity = 1) {
     // Internal semaphore value.
-    this._sem = Math.floor(capacity);
+    this._sem = Math.trunc(capacity);
     // Internal waiting queue.
     this._queue = new FastQueue();
     // Validate capacity.
-    if (typeof capacity !== `number` || this._sem < 0)
+    if (typeof capacity !== `number` || this._sem < 0) {
       throw new Error(`Invalid Capacity ${capacity}`);
+    }
 
     // Common function alias
     /** @alias Semaphore.wait @see Semaphore.wait */
@@ -36,29 +37,34 @@ class Semaphore {
 
   /**
    * Attempt to acquire/consume semaphore value,
-   * @param {number} [n=1] repeated times.
    * @async
-   * @returns {Promise<undefined>} promise resolves when passing semaphore condition.
+   * @param {number} [n=1] - Wait cycles.
+   * @returns {Promise<void>} - The promise resolves when semaphore condition passes.
    */
-  async wait(n = 1) {
-    while (n--)
-      await new Promise((resolve, reject) => {
-        this._sem > 0 && --this._sem >= 0 ? resolve() : this._queue.push([resolve, reject]);
-      });
+  wait (n = 1) {
+    const recHelper = () => {
+      if (!n) return Promise.resolve();
+      --n;
+      return this._sem > 0 && --this._sem >= 0
+        ? recHelper()
+        : new Promise((resolve, reject) => this._queue.push([resolve, reject])).then(recHelper);
+    };
+    return recHelper();
   }
 
   /**
    * Resolve waiting promises or increment semaphore value.
-   * @param {number} [n=1] repeated times.
+   * @param {number} [n=1] - Signal times.
    */
-  signal(n = 1) {
+  signal (n = 1) {
     while (n--) this._queue.length ? this._queue.shift()[0]() : ++this._sem;
   }
 
   /** Reject all promises on the waiting queue. */
-  rejectAll() {
-    while (this._queue.length)
+  rejectAll () {
+    while (this._queue.length) {
       this._queue.shift()[1](new Error(`[Semaphore] Task cancled as rejectAll() gets called.`));
+    }
   }
 }
 

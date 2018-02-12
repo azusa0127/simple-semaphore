@@ -1,28 +1,17 @@
 {
   "name": "simple-semaphore",
   "version": "2.0.1",
-  "description": "Simple semaphore implementation in promise.",
+  "description": "Fast semaphore implementation with promise support.",
   "main": "index.js",
   "scripts": {
     "test": "node example.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/azusa0127/simple-semaphore.git"
-  },
-  "keywords": [
-    "async",
-    "semaphore",
-    "with",
-    "promise"
-  ],
+  "repository": "github:azusa0127/simple-semaphore",
+  "keywords": ["async", "semaphore", "promise"],
   "author": "Phoenix (github.com/azusa0127)",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/azusa0127/simple-semaphore/issues"
-  },
   "homepage": "https://github.com/azusa0127/simple-semaphore#readme",
   "dependencies": {
-    "fastqueue": "latest"
+    "fastqueue": "^0.1.0"
   }
 }

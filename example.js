@@ -15,43 +15,43 @@ const stock = {
 
 // A classic producer that produces 1 item at a time.
 class Producer {
-  constructor(iterations) {
+  constructor (iterations) {
     this.iterations = iterations;
   }
 
-  static async produce() {
+  static async produce () {
     await stock.notfull.wait();
     assert(++stock.items <= 10, `Stock overflowed! ${stock.items}`);
     console.log(`Stock after produce: ${stock.items}`);
     stock.notempty.signal();
   }
 
-  async work() {
+  async work () {
     while (this.iterations--) await Producer.produce();
   }
 }
 
 // A classic consumer that consumes 1 item at a time.
 class Consumer {
-  constructor(iterations) {
+  constructor (iterations) {
     this.iterations = iterations;
   }
 
-  static async consume() {
+  static async consume () {
     await stock.notempty.wait();
     assert(--stock.items >= 0, `Stock underflowed! ${stock.items}`);
     console.log(`Stock after consume: ${stock.items}`);
     stock.notfull.signal();
   }
 
-  async work() {
+  async work () {
     while (this.iterations--) await Consumer.consume();
   }
 }
 
 // An efficient producer that produces 10 item at a time and only produces when stock gets empty.
 class EfficientProducer extends Producer {
-  static async produce() {
+  static async produce () {
     await stock.notfull.wait(10);
     stock.items += 10;
     assert(stock.items <= 10, `Stock overflowed! ${stock.items}`);
@@ -59,13 +59,13 @@ class EfficientProducer extends Producer {
     stock.notempty.signal(10);
   }
 
-  async work() {
+  async work () {
     while (this.iterations--) await EfficientProducer.produce();
   }
 }
 
 // Async wrapped main function.
-async function main() {
+async function main () {
   console.log(`\n\n[Single step producer]`);
   const workers1 = [
     new Producer(100),
@@ -97,7 +97,7 @@ async function main() {
   stock.notempty.rejectAll();
   p.then(
     () => console.error(`[ERROR] This promise should not resolve.`),
-    err => console.log(`Successfully received a rejected Error - ${err.message}`),
+    err => console.log(`Successfully received a rejected Error - ${err.message}`)
   );
 }
 
