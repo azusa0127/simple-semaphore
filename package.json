@@ -1,13 +1,17 @@
 {
   "name": "simple-semaphore",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Fast semaphore implementation with promise support.",
   "main": "index.js",
   "scripts": {
     "test": "node example.js"
   },
   "repository": "github:azusa0127/simple-semaphore",
-  "keywords": ["async", "semaphore", "promise"],
+  "keywords": [
+    "async",
+    "semaphore",
+    "promise"
+  ],
   "author": "Phoenix (github.com/azusa0127)",
   "license": "MIT",
   "homepage": "https://github.com/azusa0127/simple-semaphore#readme",
